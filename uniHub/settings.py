@@ -29,6 +29,8 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'uniinfohub.onrender.com']
 
 # Application definition
 
+
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -41,9 +43,9 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'crispy_forms',  
 ]
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -136,6 +138,6 @@ STATICFILES_DIRS = [
 ]
 # Where collectstatic will collect all static files for deployment
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
