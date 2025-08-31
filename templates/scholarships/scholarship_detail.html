@@ -1,331 +1,106 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ scholarship.title }} - Scholarship Details{% endblock %}
+{% block title %}UCSYerHub - Home{% endblock %}
 
 {% block extra_css %}
-<style>
-    /* ===================================
-       Color Variables (Matching Base Theme)
-    ====================================== */
-    :root {
-        --primary-dark: #0A2463;
-        --primary-light: #E7FAFE;
-        --accent-primary: #5C9EAD;
-        --accent-secondary: #F4A261;
-        --card-bg: #ffffff;
-        --text-dark: #1a1a2e;
-        --text-light: #777;
-        --border-color: #ddd;
-        --hover-bg: #f9fafb;
-    }
+<link rel="stylesheet" href="{% static 'css/scholarhomepage.css' %}">
 
-    /* ===================================
-       Scholarship Detail Page Styles
-    ====================================== */
-    .detail-container {
-        max-width: 900px;
-        margin: 2rem auto;
-        background-color: var(--card-bg);
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        border: 1px solid var(--border-color);
-    }
-
-    .banner-image {
-        width: 100%;
-        max-height: 250px;
-        object-fit: cover;
-        border-bottom: 1px solid var(--border-color);
-    }
-
-    .detail-header {
-        background-color: var(--primary-light);
-        padding: 2rem;
-        color: var(--primary-dark);
-        border-bottom: 1px solid var(--border-color);
-    }
-
-    .detail-title {
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 1rem;
-        color: var(--primary-dark);
-    }
-
-    .detail-badges {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.75rem;
-    }
-
-    .detail-badge {
-        background-color: var(--accent-primary);
-        color: white;
-        padding: 0.4rem 0.9rem;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        display: inline-flex;
-        align-items: center;
-        font-weight: 500;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-    }
-
-    .detail-badge .fas,
-    .detail-badge .bi {
-        font-size: 0.9rem;
-        margin-right: 0.5rem;
-    }
-
-    .detail-body {
-        padding: 2rem;
-    }
-
-    .section-title {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: var(--primary-dark);
-        margin: 1.5rem 0 1rem;
-        position: relative;
-    }
-
-    /* This is the new rule for the full line */
-    .section-title::after {
-        content: "";
-        display: block;
-        width: 100%;
-        height: 1px;
-        background-color: var(--primary-dark);
-        margin-top: 0.5rem;
-        border-radius: 0;
-        opacity: 0.2; /* A subtle line looks better */
-    }
-
-    .info-box {
-        background-color: var(--primary-light);
-        border-radius: 8px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        border-left: 4px solid var(--accent-secondary);
-    }
-
-    .info-title {
-        color: var(--primary-dark);
-        font-size: 1.2rem;
-        font-weight: 600;
-        margin-bottom: 0.8rem;
-        display: flex;
-        align-items: center;
-    }
-
-    .info-title .fas,
-    .info-title .bi {
-        font-size: 1.2rem;
-        margin-right: 0.8rem;
-        color: var(--accent-secondary);
-    }
-
-    .info-box a {
-        color: var(--accent-primary);
-        font-weight: 500;
-        text-decoration: none;
-        transition: color 0.3s ease;
-    }
-
-    .info-box a:hover {
-        color: var(--primary-dark);
-    }
-
-    .back-btn {
-        margin-bottom: 1.5rem;
-        background-color: var(--hover-bg);
-        border: 1px solid var(--border-color);
-        color: var(--text-dark);
-        transition: all 0.3s ease;
-    }
-
-    .back-btn:hover {
-        background-color: var(--border-color);
-        transform: translateY(-2px);
-    }
-
-    .action-btns {
-        margin-top: 2rem;
-        display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-    }
-
-    .status-badge {
-        display: inline-block;
-        padding: 0.35rem 0.75rem;
-        border-radius: 20px;
-        font-weight: 500;
-        font-size: 0.85rem;
-    }
-
-    .active-status {
-        background-color: rgba(50, 205, 50, 0.1);
-        color: green;
-        border: 1px solid rgba(50, 205, 50, 0.2);
-    }
-
-    .inactive-status {
-        background-color: rgba(255, 59, 48, 0.1);
-        color: red;
-        border: 1px solid rgba(255, 59, 48, 0.2);
-    }
-
-    /* Button styles */
-    .btn-primary {
-        background-color: var(--accent-primary);
-        border: none;
-        color: white;
-        font-weight: 500;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(92, 158, 173, 0.2);
-    }
-
-    .btn-warning {
-        background-color: var(--accent-secondary);
-        border: none;
-        color: var(--primary-dark);
-        font-weight: 500;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .btn-warning:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(244, 162, 97, 0.2);
-    }
-
-    .btn-danger {
-        background-color: #dc3545;
-        border: none;
-        color: white;
-        font-weight: 500;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .btn-danger:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(220, 53, 69, 0.2);
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .detail-container {
-            margin: 1rem;
-        }
-
-        .detail-header {
-            padding: 1.5rem;
-        }
-
-        .detail-title {
-            font-size: 1.5rem;
-        }
-    }
-</style>
 {% endblock %}
-
 {% block content %}
-<div class="container p-4">
-    <a href="{% url 'scholarships:list' %}" class="btn back-btn ">
-        <i class="fas fa-arrow-left"></i> Back to Scholarships
-    </a>
 
-    <div class="detail-container">
-        {% if scholarship.banner_image %}
-        <img src="{{ scholarship.banner_image.url }}" class="banner-image" alt="{{ scholarship.title }} banner">
-        {% endif %}
-
-        <div class="detail-header">
-            <h1 class="detail-title">{{ scholarship.title }}</h1>
-
-            <div class="detail-badges">
-                <span class="status-badge {% if scholarship.deadline > today %}active-status{% else %}inactive-status{% endif %}">
-                    <i class="fas fa-circle"></i> {% if scholarship.deadline > today %}Active{% else %}Expired{% endif %}
-                </span>
-
-                {% if scholarship.min_gpa %}
-                <span class="detail-badge">
-                    <i class="fas fa-award"></i> Min GPA: {{ scholarship.min_gpa }}
-                </span>
-                {% endif %}
-
-                <span class="detail-badge">
-                    <i class="fas fa-graduation-cap"></i> {{ scholarship.get_major_display }}
-                </span>
-
-                <span class="detail-badge">
-                    <i class="fas fa-calendar-times"></i> Deadline: {{ scholarship.deadline|date:"M d, Y" }}
-                </span>
-
-                {% if scholarship.country %}
-                <span class="detail-badge">
-                    <i class="fas fa-map-marker-alt"></i> {{ scholarship.country }}
-                </span>
-                {% endif %}
+<div class="slideshow-container">
+    <div class="slideshow">
+        <div class="slide">
+            <div class="slide-content">
+                <h1>Discover Your Academic Potential</h1>
+                <p>Find opportunities tailored to your goals and aspirations</p>
             </div>
         </div>
 
-        <div class="detail-body">
-            <h3 class="section-title">Description</h3>
-            <p>{{ scholarship.description|linebreaks }}</p>
-
-            <h3 class="section-title">Eligibility Requirements</h3>
-            <p>{{ scholarship.eligibility|linebreaks }}</p>
-
-            <div class="info-box">
-                <h4 class="info-title"><i class="fas fa-link me-2"></i> Application Details</h4>
-                {% if scholarship.application_link %}
-                <p><strong>Online Application:</strong> <a href="{{ scholarship.application_link }}" target="_blank" class="text-accent">{{ scholarship.application_link }}</a></p>
-                {% endif %}
-
-                {% if scholarship.brochure_pdf %}
-                <p><strong>Download Brochure:</strong> Contains full application details and requirements</p>
-                {% endif %}
+        <div class="slide">
+            <div class="slide-content">
+                <h1>Connect with Industry Leaders</h1>
+                <p>Build your professional network and gain valuable experience</p>
             </div>
+        </div>
 
-            <div class="action-btns">
-                {% if scholarship.brochure_pdf %}
-                <a href="{{ scholarship.brochure_pdf.url }}" class="btn btn-primary" download>
-                    <i class="fas fa-file-pdf"></i> Download Brochure
-                </a>
-                {% endif %}
-
-                {% if scholarship.application_link %}
-                <a href="{{ scholarship.application_link }}" class="btn btn-primary" target="_blank">
-                    <i class="fas fa-external-link-alt"></i> Apply Online
-                </a>
-                {% endif %}
-
-                {% if user.is_authenticated and user.is_staff %}
-                <a href="{% url 'scholarships:edit_scholarship' scholarship.id %}" class="btn btn-warning">
-                    <i class="fas fa-edit"></i> Edit
-                </a>
-                <a href="{% url 'scholarships:delete_scholarship' scholarship.id %}" class="btn btn-danger">
-                    <i class="fas fa-trash"></i> Delete
-                </a>
-                {% endif %}
-            </div>
-
-            <div class="mt-4 text-muted">
-                <small>
-                    Posted {{ scholarship.created_at|timesince }} ago
-                    {% if scholarship.posted_by %}
-                        by {{ scholarship.posted_by.get_full_name }}
-                    {% endif %}
-                    | Last updated: {{ scholarship.updated_at|date:"M d, Y" }}
-                </small>
+        <div class="slide">
+            <div class="slide-content">
+                <h1>Transform Your Career Path</h1>
+                <p>Access resources to help you navigate your academic journey</p>
             </div>
         </div>
     </div>
 </div>
+
+<section class="categories">
+    <div class="container">
+        <h2 class="section-title">Explore Opportunities</h2>
+
+        <div class="category-cards">
+            <a href="{% url 'scholarships:list' %}" class="category-card">
+    <div class="card-image">
+        <img src="{% static 'images/announcement.jpg' %}" alt="Scholarships">
+    </div>
+    <div class="card-content">
+        <h3>Scholarships</h3>
+        <p>Discover financial aid opportunities to support your education. Find scholarships tailored to your field of study, achievements, and background.</p>
+        <div class="card-link">
+            Explore Scholarships <i class="fas fa-arrow-right"></i>
+        </div>
+    </div>
+</a>
+
+            <a href="{% url 'internships' %}" class="category-card">
+                <div class="card-image">
+                    <img src="{% static 'images/scholarship.jpg' %}" alt="Internships">
+                </div>
+                <div class="card-content">
+                    <h3>Internships</h3>
+                    <p>Gain practical experience in your field of interest. Connect with top companies and organizations offering valuable internship opportunities.</p>
+                    <div class="card-link">
+                        Find Internships <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+            </a>
+
+            <a href="{% url 'scholarships:announcements_list' %}" class="category-card">
+                <div class="card-image">
+                    <img src="{% static 'images/intern4.jpg' %}" alt="Activities">
+                </div>
+                <div class="card-content">
+                    <h3>Announcement</h3>
+                    <p>Stay up-to-date with the latest news, events, and important notices from the university.</p>
+                    <div class="card-link">
+                        Browse Activities <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="stats">
+    <div class="container">
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-number">1,250+</div>
+                <div class="stat-label">Scholarships</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">850+</div>
+                <div class="stat-label">Internships</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">500+</div>
+                <div class="stat-label">Activities</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">25,000+</div>
+                <div class="stat-label">Students</div>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}
