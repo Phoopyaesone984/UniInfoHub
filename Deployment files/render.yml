@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: unihub
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn uniHub.wsgi:application"
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: uniHub.settings
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False
+      - key: DATABASE_URL
+        fromDatabase:
+          name: unihub-db
+          property: connectionString
+
+databases:
+  - name: unihub-db
+    databaseName: unihub

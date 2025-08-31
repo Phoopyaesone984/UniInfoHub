@@ -15,11 +15,9 @@
     </div>
 
     <div class="row">
-        <!-- Left Column - Profile Section -->
         <div class="col-lg-6">
             <div class="dashboard-card">
                 <h2 class="section-title"><i class="bi bi-person-circle"></i>Profile Information</h2>
-
                 <form method="post" action="">
                     {% csrf_token %}
                     <input type="hidden" name="form_type" value="profile_update">
@@ -33,7 +31,6 @@
                                 {{ user.username }}
                             </div>
                         </div>
-
                         <div class="info-item">
                             <div class="info-label">
                                 <i class="bi bi-envelope info-icon"></i>
@@ -43,7 +40,6 @@
                                 {{ user.email }}
                             </div>
                         </div>
-
                         <div class="info-item">
                             <div class="info-label">
                                 <i class="bi bi-card-heading info-icon"></i>
@@ -53,7 +49,6 @@
                                 {{ user.userprofile.roll_no }}
                             </div>
                         </div>
-
                         <div class="info-item">
                             <div class="info-label">
                                 <i class="bi bi-mortarboard info-icon"></i>
@@ -64,7 +59,6 @@
                                 {{ profile_form.major.errors }}
                             </div>
                         </div>
-
                         <div class="info-item">
                             <div class="info-label">
                                 <i class="bi bi-collection info-icon"></i>
@@ -80,7 +74,6 @@
                         <i class="bi bi-save"></i> Update Profile
                     </button>
                 </form>
-
                 <div class="password-section">
                     <h3 class="mb-4"><i class="bi bi-shield-lock"></i> Change Password</h3>
                     <form class="password-form" method="post" action="{% url 'student_dashboard' %}">
@@ -93,7 +86,6 @@
                                 <div class="invalid-feedback">{{ error }}</div>
                             {% endfor %}
                         </div>
-
                         <div class="form-group">
                             <label for="id_new_password1">New Password</label>
                             <input type="password" class="form-control {% if password_form.new_password1.errors %}is-invalid{% endif %}" id="id_new_password1" name="new_password1" required>
@@ -104,7 +96,6 @@
                                 <div class="invalid-feedback">{{ error }}</div>
                             {% endfor %}
                         </div>
-
                         <div class="form-group">
                             <label for="id_new_password2">Confirm New Password</label>
                             <input type="password" class="form-control {% if password_form.new_password2.errors %}is-invalid{% endif %}" id="id_new_password2" name="new_password2" required>
@@ -112,7 +103,6 @@
                                 <div class="invalid-feedback">{{ error }}</div>
                             {% endfor %}
                         </div>
-
                         {% if password_form.non_field_errors %}
                             <div class="alert alert-danger">
                                 {% for error in password_form.non_field_errors %}
@@ -120,7 +110,6 @@
                                 {% endfor %}
                             </div>
                         {% endif %}
-
                         <div class="d-flex justify-content-end">
                             <button type="submit" class="btn btn-gradient-primary">Change Password</button>
                         </div>
@@ -133,23 +122,21 @@
             <div class="dashboard-card">
                 <div class="d-flex justify-content-between align-items-center">
                     <h2 class="section-title"><i class="bi bi-bookmark-star"></i>Wishlist</h2>
-                    <span class="badge badge-primary">{{ wishlist_scholarships|length }} saved</span>
+                    <span class="badge badge-primary">{{ wishlist_scholarships.paginator.count }} saved</span>
                 </div>
-
                 <div class="scholarship-list">
                     {% if wishlist_scholarships %}
                         {% for scholarship in wishlist_scholarships %}
                         <div class="scholarship-card">
                             <div class="scholarship-header d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0">{{ scholarship.title }}</h5>
-                                <span class="badge deadline-badge {% if not scholarship.is_active %}bg-secondary{% endif %}">
+                                <span class="badge deadline-badge {% if scholarship.deadline < today %}bg-secondary{% endif %}">
                                     Deadline: {{ scholarship.deadline|date:"M d, Y" }}
                                 </span>
                             </div>
-
                             <div class="d-flex justify-content-end">
-                                <span class="badge {% if scholarship.is_active %}bg-success{% else %}bg-danger{% endif %}">
-                                    {% if scholarship.is_active %}Active{% else %}Expired{% endif %}
+                                <span class="badge {% if scholarship.deadline > today %}bg-success{% else %}bg-danger{% endif %}">
+                                    {% if scholarship.deadline > today %}Active{% else %}Expired{% endif %}
                                 </span>
                             </div>
 
@@ -159,6 +146,7 @@
                                         <i class="bi bi-award me-1"></i> GPA {{ scholarship.min_gpa }}
                                     </span>
                                 {% endif %}
+
                                 <span class="badge-custom me-2 mb-2">
                                     <i class="bi bi-book me-1"></i> {{ scholarship.get_major_display }}
                                 </span>
@@ -168,20 +156,16 @@
                                     </span>
                                 {% endif %}
                             </div>
-
                             <p class="card-text">{{ scholarship.description|truncatewords:30 }}</p>
-
                             <div class="d-flex justify-content-between align-items-center mt-3">
                                 <small class="text-muted">
                                     <i class="bi bi-clock-history me-1"></i> Posted {{ scholarship.created_at|timesince }} ago
                                 </small>
-
                                 <div>
                                     <button class="btn btn-sm btn-outline-danger remove-btn me-2"
                                             data-scholarship-id="{{ scholarship.id }}">
                                         <i class="bi bi-trash me-1"></i> Remove
                                     </button>
-
                                     <a href="{% url 'scholarships:scholarship_detail' scholarship.id %}"
                                        class="btn btn-sm btn-outline-secondary ms-2">
                                         <i class="bi bi-eye me-1"></i> Details
@@ -190,6 +174,49 @@
                             </div>
                         </div>
                         {% endfor %}
+
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center mt-4">
+                                {% if wishlist_scholarships.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ wishlist_scholarships.previous_page_number }}" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true" aria-label="Previous">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+
+                                {% for i in wishlist_scholarships.paginator.page_range %}
+                                    {% if wishlist_scholarships.number == i %}
+                                        <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                                    {% else %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if wishlist_scholarships.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ wishlist_scholarships.next_page_number }}" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+
                     {% else %}
                         <div class="empty-wishlist">
                             <i class="bi bi-bookmark-x"></i>
@@ -249,7 +276,7 @@
                 fetch(url, {
                     method: 'POST',
                     headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
                         'Content-Type': 'application/json'
                     }
                 })
@@ -280,7 +307,7 @@
                                 document.querySelector('.scholarship-list').innerHTML = `
                                     <div class="empty-wishlist">
                                         <i class="bi bi-bookmark-x"></i>
-                                        <h3>No Saved Scholarships</h3>
+                                        <h3>No Scholarships</h3>
                                         <p>You haven't saved any scholarships yet.</p>
                                         <a href="{% url 'scholarships:list' %}" class="btn btn-gradient-primary mt-3">
                                             <i class="bi bi-search me-2 fs-6"></i>Browse Scholarships
