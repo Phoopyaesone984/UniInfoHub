@@ -1,0 +1,428 @@
+/* ===============================
+   Global
+================================== */
+body {
+    font-family: 'Inter', sans-serif;
+    background: #f8fafc;
+    color: #1a1a2e;
+    line-height: 1.6;
+}
+
+/* Section Titles */
+.section-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 2.5rem;
+    color: #0a2463;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.section-title::after {
+    content: "";
+    display: block;
+    width: 60px;
+    height: 4px;
+    margin: 0.5rem 0 0 15px;
+    background: linear-gradient(90deg, #0a2463, #5c9ead);
+    border-radius: 2px;
+}
+
+.section-title i {
+    margin-right: 15px;
+    color: #0a2463;
+}
+
+/* ===============================
+   Dashboard Container
+================================== */
+.dashboard-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+/* ===============================
+   Dashboard Header
+================================== */
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 30px;
+    background: #e7fafe;
+    border-radius: 15px;
+    border: 1px solid #5c9ead;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 15px;
+    color: #0a2463;
+    background: linear-gradient(90deg, #0a2463, #5c9ead);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.dashboard-header .lead {
+    font-size: 1.3rem;
+    color: #5c9ead;
+    font-weight: 500;
+}
+
+/* ===============================
+   Dashboard Cards
+================================== */
+.dashboard-card {
+    background-color: #ffffff;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    border: 1px solid #e7fafe;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* ===============================
+   Profile Info
+================================== */
+.profile-info {
+    padding: 15px 0;
+}
+
+.info-item {
+    display: flex;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e7fafe;
+}
+
+.info-label {
+    width: 180px;
+    font-weight: 600;
+    color: #0a2463;
+}
+
+.info-value {
+    flex: 1;
+    color: #1a1a2e;
+}
+
+.info-icon {
+    margin-right: 12px;
+    color: #0a2463;
+    min-width: 24px;
+}
+
+/* ===============================
+   Password Section
+================================== */
+.password-section {
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 1px solid #e7fafe;
+}
+
+.password-strength {
+    height: 5px;
+    border-radius: 2.5px;
+    margin-top: 0.25rem;
+    background: #e7fafe;
+    position: relative;
+    overflow: hidden;
+}
+
+.password-strength-meter {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 0;
+    transition: width 0.3s;
+}
+
+.password-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.password-form label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #0a2463;
+}
+
+/* Force white background for all form controls */
+.password-form .form-control,
+.password-form input[type="password"],
+.password-form input[type="text"],
+.password-form select,
+.password-form textarea {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    border: 1px solid #ddd !important;
+    color: #1a1a2e !important;
+    padding: 0.75rem !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+}
+
+.password-form .form-control:focus,
+.password-form input[type="password"]:focus,
+.password-form input[type="text"]:focus,
+.password-form select:focus,
+.password-form textarea:focus {
+    border-color: #5c9ead !important;
+    box-shadow: 0 0 0 0.2rem rgba(92, 158, 173, 0.25) !important;
+    background: #ffffff !important;
+    color: #1a1a2e !important;
+}
+
+/* Also target form controls inside the profile section */
+.dashboard-card .form-control,
+.dashboard-card input[type="text"],
+.dashboard-card input[type="password"],
+.dashboard-card select,
+.dashboard-card textarea {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    border: 1px solid #ddd !important;
+    color: #1a1a2e !important;
+    padding: 0.75rem !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+}
+
+.dashboard-card .form-control:focus,
+.dashboard-card input[type="text"]:focus,
+.dashboard-card input[type="password"]:focus,
+.dashboard-card select:focus,
+.dashboard-card textarea:focus {
+    border-color: #5c9ead !important;
+    box-shadow: 0 0 0 0.2rem rgba(92, 158, 173, 0.25) !important;
+    background: #ffffff !important;
+    color: #1a1a2e !important;
+}
+
+.text-danger {
+    color: #f4a261;
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+}
+
+/* Style form fields with errors */
+.is-invalid {
+    border-color: #f4a261 !important;
+}
+
+.is-invalid:focus {
+    box-shadow: 0 0 0 0.2rem rgba(244, 162, 97, 0.25) !important;
+}
+
+/* ===============================
+   Buttons
+================================== */
+.btn-gradient-primary {
+    background: linear-gradient(90deg, #0a2463, #5c9ead);
+    color: #FFFFFF;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    border: 2px solid #0A2463;
+    transition: 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-gradient-primary:hover {
+    background-color: #FFFFFF;
+    color: #0A2463;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* ===============================
+   Scholarship Wishlist
+================================== */
+.scholarship-card {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #e7fafe;
+    transition: all 0.3s;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.scholarship-card:hover {
+    border-color: #5c9ead;
+    background: #f9fafb;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.scholarship-header h5 {
+    color: #0a2463;
+    font-weight: 700;
+}
+
+.deadline-badge {
+    background-color: #f4a261;
+    color: white;
+    font-size: 0.85rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 6px;
+}
+
+.badge-custom {
+    background-color: #e7fafe;
+    color: #0a2463;
+    font-size: 0.8rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #5c9ead;
+}
+
+.card-text {
+    color: #444;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.remove-btn {
+    background: rgba(244, 162, 97, 0.1);
+    border: 1px solid #f4a261;
+    color: #f4a261;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+}
+
+.remove-btn:hover {
+    background: rgba(244, 162, 97, 0.2);
+    transform: translateY(-2px);
+}
+
+.remove-btn i {
+    margin-right: 5px;
+}
+
+.btn-outline-secondary {
+    border: 1px solid #5c9ead;
+    color: #5c9ead;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-secondary:hover {
+    background: #5c9ead;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-outline-secondary i {
+    margin-right: 5px;
+}
+
+.badge-primary {
+    background: linear-gradient(90deg, #0a2463, #5c9ead);
+    color: white;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+}
+
+/* ===============================
+   Empty Wishlist
+================================== */
+.empty-wishlist {
+    text-align: center;
+    padding: 50px 20px;
+    color: #777;
+}
+
+.empty-wishlist i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    color: #5c9ead;
+    opacity: 0.5;
+}
+
+.empty-wishlist h3 {
+    margin-bottom: 15px;
+    color: #0a2463;
+}
+
+/* ===============================
+   Responsive Adjustments
+================================== */
+@media (max-width: 992px) {
+    .dashboard-title {
+        font-size: 2rem;
+    }
+
+    .dashboard-header {
+        padding: 20px;
+    }
+
+    .dashboard-header .lead {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 10px;
+        margin: 20px auto;
+    }
+
+    .dashboard-card {
+        padding: 20px;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+    }
+
+    .info-item {
+        flex-direction: column;
+    }
+
+    .info-label {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+
+    .dashboard-title {
+        font-size: 1.8rem;
+    }
+
+    .dashboard-header .lead {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .dashboard-header {
+        padding: 15px;
+    }
+
+    .dashboard-title {
+        font-size: 1.5rem;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+    }
+
+    .btn-gradient-primary {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
+}

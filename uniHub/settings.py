@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,9 +25,8 @@ SECRET_KEY = 'django-insecure-j%v^1^+-hq)_0#fdakx&668t)9usq^fw!eh6@z7ec#9xekq3r#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'uniinfohub-1.onrender.com']
 
-
-ALLOWED_HOSTS = ['uniinfohub-1.onrender.com']
 # Application definition
 
 INSTALLED_APPS = [
@@ -54,7 +53,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'uniHub.urls'
-import os
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
