@@ -135,5 +135,8 @@ LOGIN_URL = 'scholarships:login'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+# Where collectstatic will collect all static files for deployment
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
