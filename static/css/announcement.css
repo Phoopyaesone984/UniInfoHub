@@ -274,6 +274,7 @@ body {
     }
 }
 
+
 @media (max-width: 600px) {
     .announcements-grid {
         grid-template-columns: 1fr;

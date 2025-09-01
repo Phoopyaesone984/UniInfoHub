@@ -71,7 +71,7 @@
             </div>
         </div>
 
-        <div class="col-lg-9">
+<div class="col-lg-9">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h4 class="mb-0">Available Scholarships</h4>
                 <div>
@@ -90,9 +90,9 @@
                         <h5 class="mb-0">{{ scholarship.title }}</h5>
                         <div>
                             {% if scholarship.deadline > today %}
-                                <span class="badge bg-success me-2">Active</span>
+                                <span class="badge bg-success m-2">Active</span>
                             {% else %}
-                                <span class="badge bg-danger me-2">Expired</span>
+                                <span class="badge bg-danger m-2">Expired</span>
                             {% endif %}
                             <span class="deadline-badge">Deadline: {{ scholarship.deadline|date:"M d, Y" }}</span>
                         </div>
@@ -124,7 +124,7 @@
                                 {% if scholarship in user.wishlist.all %}Added{% else %}Add to wishlist{% endif %}
                             </button>
 
-                            <div>
+<div>
                                 {% if scholarship.brochure_pdf %}
                                     <a href="{{ scholarship.brochure_pdf.url }}" class="btn btn-sm btn-outline-secondary me-2" download>
                                         <i class="bi bi-file-earmark-pdf me-1"></i>Download PDF
@@ -179,7 +179,7 @@
                 </nav>
                 {% endif %}
 
-            {% else %}
+{% else %}
                 <div class="alert alert-info">
                     <i class="bi bi-info-circle me-2"></i>No scholarships found matching your criteria.
                 </div>
@@ -216,7 +216,7 @@
             const button = this;
             const icon = button.querySelector('i');
 
-            fetch(`/scholarships/toggle-wishlist/${scholarshipId}/`, {
+            fetch(/scholarships/toggle-wishlist/${scholarshipId}/, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': getCookie('csrftoken'),
