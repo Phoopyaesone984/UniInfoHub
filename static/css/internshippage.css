@@ -9,11 +9,6 @@
     --gradient-primary: linear-gradient(90deg, #0a2463, #5c9ead);
 }
 
-body {
-    background-color: var(--bg-light);
-    color: var(--text-primary);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
 
 /* Hero Section - Converted to Slider */
 .hero-slider {
@@ -153,6 +148,8 @@ body {
     font-weight: 600;
     color: var(--primary-dark);
 }
+
+
 /* Testimonial Cards - Fixed Layout */
         .testimonials-container {
             display: flex;

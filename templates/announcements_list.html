@@ -11,117 +11,105 @@
 <div class="announcements-container">
     <div class="page-header">
         <h2>{{ title }}</h2>
-        <p>Browse through the latest updates and important notices</p>
+        <p>Latest announcements pinned on the board</p>
     </div>
 
-{% if announcements %}
+    {% if page_obj %}
     <div class="announcements-grid">
-        {% for announcement in announcements %}
+        {% for announcement in page_obj %}
         <div class="announcement-card">
+            {% if announcement.is_new %}
+            <div class="new-badge">NEW</div>
+            {% endif %}
             <h3 class="card-title">{{ announcement.title }}</h3>
+
             <div class="card-meta">
                 {% if announcement.place %}
-                <div class="meta-item"><i class="bi bi-geo-alt-fill"></i> {{ announcement.place }}</div>
+                    <div><i class="bi bi-geo-alt-fill"></i> {{ announcement.place }}</div>
                 {% endif %}
                 {% if announcement.time %}
-                <div class="meta-item"><i class="bi bi-clock-fill"></i> {{ announcement.time|date:"g:i A" }}</div>
+                    <div><i class="bi bi-clock-fill"></i> {{ announcement.time|date:"g:i A" }}</div>
                 {% endif %}
             </div>
 
-            {% if announcement.tags %}
-            <div class="card-tags">
-                {% for tag in announcement.tags %}
-                <span class="tag">#{{ tag }}</span>
-                {% endfor %}
+            <div class="card-content-wrapper collapsed">
+                <div class="card-content">
+                    {{ announcement.content|linebreaks }}
+                </div>
+            </div>
+
+            {% if announcement.content|length > 300 %}
+                <span class="see-more" data-target="{{ forloop.counter }}">Read more</span>
+            {% endif %}
+
+            {% if announcement.attachment %}
+            <div class="attachment">
+                <a href="{{ announcement.attachment.url }}" target="_blank">📎 Attachment</a>
             </div>
             {% endif %}
 
-            <div class="card-content collapsed" id="content-{{ forloop.counter }}">
-                {{ announcement.content }}
-            </div>
-            <button class="see-more-btn" data-target="content-{{ forloop.counter }}" aria-expanded="false">
-                Read more <i class="bi bi-arrow-right"></i>
-            </button>
-
-           {% if announcement.attachment %}
-<div class="attachment mt-4 mb-3">
-    {% if announcement.attachment.name|lower|slice:"-4:" == ".pdf" %}
-        <a href="{{ announcement.attachment.url }}" target="_blank" class="btn btn-outline-secondary d-flex align-items-center">
-            <i class="bi bi-file-earmark-fill me-2"></i> View Document (PDF)
-        </a>
-    {% elif announcement.attachment.name|lower|slice:"-4:" in ".png.jpg.jpeg.gif" %}
-        <a href="{{ announcement.attachment.url }}" target="_blank">
-            <img src="{{ announcement.attachment.url }}" class="img-fluid rounded" alt="Attachment for {{ announcement.title }}">
-        </a>
-    {% else %}
-        <a href="{{ announcement.attachment.url }}" target="_blank" class="btn btn-outline-secondary d-flex align-items-center">
-            <i class="bi bi-file-earmark-arrow-down-fill me-2"></i> Download File
-        </a>
-    {% endif %}
-</div>
-{% endif %}
-
             <div class="card-footer">
-                <div class="posted-at">
-                    <i class="bi bi-calendar-event"></i>
-                    {{ announcement.created_at|date:"M d, Y" }}
-                </div>
+                {{ announcement.created_at|date:"M d, Y" }}
             </div>
         </div>
         {% endfor %}
     </div>
-{% else %}
-    <div class="empty-state">
-        <i class="bi bi-megaphone"></i>
-        <h3>No Announcements Yet</h3>
-        <p>Check back later for updates or contact the administration if this is unexpected.</p>
-        <a href="#" class="btn btn-primary">Refresh Page <i class="bi bi-arrow-repeat"></i></a>
+
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; First</a>
+            <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+        <span class="current-page">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+        {% endif %}
     </div>
-{% endif %}
+    {% else %}
+    <p>No announcements available.</p>
+    {% endif %}
+</div>
+<div id="announcementModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h3 id="modalTitle" class="modal-title"></h3>
+        <div id="modalContent" class="modal-body"></div>
+    </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    var grid = document.querySelector('.announcements-grid');
+    const modal = document.getElementById('announcementModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalContent = document.getElementById('modalContent');
+    const closeBtn = document.querySelector('.close-btn');
 
-    // Init Masonry for re-layout only
-    var msnry = new Masonry(grid, {
-        itemSelector: '.announcement-card',
-        columnWidth: '.announcement-card',  // use actual card width
-        gutter: 24,
-        percentPosition: true
+    document.querySelectorAll('.see-more').forEach(link => {
+        const card = link.closest('.announcement-card');
+        const content = card.querySelector('.card-content');
+        const title = card.querySelector('.card-title');
+
+        link.addEventListener('click', function(event) {
+            event.preventDefault(); // Stop the link from navigating
+
+            // Populate the modal with the content
+            modalTitle.textContent = title.textContent;
+            modalContent.innerHTML = content.innerHTML;
+
+            // Display the modal
+            modal.style.display = 'block';
+        });
     });
 
-    document.querySelectorAll('.see-more-btn').forEach(button => {
-        const targetId = button.getAttribute('data-target');
-        const content = document.getElementById(targetId);
-
-        if (content.scrollHeight <= 180) button.style.display = "none";
-        else button.style.display = "inline-flex";
-
-        button.addEventListener('click', function() {
-            const expanded = this.getAttribute("aria-expanded") === "true";
-
-            if (!expanded) {
-                content.style.maxHeight = content.scrollHeight + "px";
-                content.classList.remove('collapsed');
-                this.innerHTML = 'Show less <i class="bi bi-arrow-up"></i>';
-                this.setAttribute("aria-expanded", "true");
-            } else {
-                content.style.maxHeight = "180px";
-                content.classList.add('collapsed');
-                this.innerHTML = 'Read more <i class="bi bi-arrow-right"></i>';
-                this.setAttribute("aria-expanded", "false");
-            }
-
-            // Re-layout grid after expand/collapse
-            setTimeout(() => msnry.layout(), 300);
-        });
+    // When the user clicks on (x), close the modal
+    closeBtn.addEventListener('click', function() {
+        modal.style.display = 'none';
     });
 });
 </script>
-
 {% endblock %}

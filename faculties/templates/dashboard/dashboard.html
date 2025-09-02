@@ -690,14 +690,10 @@
     </div>
 </div>
 {% endblock %}
-
 {% block extra_js %}
 <script>
-    $(function () {
-        // Initialize tooltips
-        $('[data-bs-toggle="tooltip"]').tooltip();
-
-        // Tab persistence - Activate tab based on URL hash
+    document.addEventListener("DOMContentLoaded", function() {
+        // Function to activate a tab based on the URL hash
         function activateTabFromHash() {
             if (location.hash) {
                 const tabElement = document.querySelector(`a[href="${location.hash}"]`);
@@ -708,16 +704,18 @@
             }
         }
 
-        // Activate tab on page load
+        // Call the function on initial page load
         activateTabFromHash();
 
-        // Activate tab when hash changes
+        // Add an event listener to re-run the function if the hash changes
         window.addEventListener('hashchange', activateTabFromHash);
 
-        // Only prevent propagation for forms that aren't delete forms
-        $('form:not(.delete-form)').on('submit', function(e) {
-            e.stopPropagation();
+        // Initialize tooltips using pure JavaScript
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
         });
+
     });
 </script>
 {% endblock %}

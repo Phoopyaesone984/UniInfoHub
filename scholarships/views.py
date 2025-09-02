@@ -3,6 +3,8 @@
 
 from .models import Scholarship, UserProfile, Company, Testimonial, Announcement, ACADEMIC_LEVEL_CHOICES
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
+from datetime import timedelta
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib import messages
 from django.db.models import Q, Case, When, IntegerField
@@ -14,6 +16,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_POST
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger  # Add this import
 from django.utils.dateparse import parse_date
 import json # Corrected: Moved import to the top of the file
 
@@ -141,7 +144,7 @@ def scholarship_list_view(request):
         )
 
     # --- Pagination Logic ---
-    paginator = Paginator(scholarships_list, 2) # Show 10 scholarships per page
+    paginator = Paginator(scholarships_list, 2)
     page_number = request.GET.get('page')
     try:
         scholarships = paginator.page(page_number)
@@ -176,7 +179,7 @@ def register_view(request):
             if hasattr(user, 'userprofile') and user.userprofile.role in ['FACULTY', 'ADMIN']:
                 return redirect('faculties:faculty_dashboard_home')
             else:
-                return redirect('scholarships:list')
+                return redirect('scholarships:homepage')
         else:
             for field, errors in form.errors.items():
                 for error in errors:
@@ -230,7 +233,12 @@ class InternshipsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['companies'] = Company.objects.all()
+        companies_list = Company.objects.all()
+        companies_paginator = Paginator(companies_list, 10)  # 9 companies per page
+        companies_page_number = self.request.GET.get('page_companies')
+        companies_page_obj = companies_paginator.get_page(companies_page_number)
+
+        context['companies'] = companies_page_obj
         context['testimonials'] = Testimonial.objects.all()
         return context
 
@@ -243,11 +251,6 @@ def scholarship_detail(request, pk):
     }
     return render(request, 'scholarships/scholarship_detail.html', context)
 
-
-# ---------- Student Dashboard & Wishlist ----------
-
-
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger  # Add this import
 
 
 @login_required
@@ -325,7 +328,20 @@ def remove_from_wishlist(request, scholarship_id):
 @login_required(login_url='login')
 def announcements_list(request):
     announcements = Announcement.objects.all().order_by('-created_at')
-    context = {'announcements': announcements, 'title': 'Announcements'}
+    today = timezone.now()
+
+    # Mark recent announcements
+    for ann in announcements:
+        ann.is_new = (today - ann.created_at).days < 7
+
+    paginator = Paginator(announcements, 6)  # 6 per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'title': 'Announcements',
+        'page_obj': page_obj
+    }
     return render(request, 'announcements_list.html', context)
 
 

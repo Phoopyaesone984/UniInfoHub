@@ -217,7 +217,7 @@ def post_company(request):
             company = form.save(commit=False)
             company.user = request.user 
             company.save()
-            return redirect('faculties:faculty_dashboard_home') 
+            return redirect(reverse('faculties:faculty_dashboard_home') + '#companies')
         else:
             # For debugging, you can print the form errors to your console.
             print("Form is not valid:", form.errors)
@@ -227,14 +227,15 @@ def post_company(request):
     context = {'form': form, 'title': 'Post New Company'}
     return render(request, 'dashboard/post_company.html', context)
 
+
+from django.urls import reverse
 # In views.py
 def delete_company(request, pk):
     company = get_object_or_404(Company, pk=pk)
     if request.method == 'POST':
         company.delete()
-        return redirect('faculties:faculty_dashboard_home')
-    return redirect('faculties:faculty_dashboard_home')
-
+        return redirect(reverse('faculties:faculty_dashboard_home') + '#companies')
+    return redirect(reverse('faculties:faculty_dashboard_home') + '#companies')
 
 
 
