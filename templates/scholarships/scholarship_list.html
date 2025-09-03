@@ -188,7 +188,6 @@
     </div>
 </div>
 {% endblock %}
-
 {% block extra_js %}
 <script>
     // Auto-rotate carousel every 5 seconds
@@ -200,6 +199,72 @@
                 wrap: true
             });
         }
+
+        // Wishlist toggle - Fixed version
+        document.querySelectorAll('.wishlist-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const scholarshipId = this.dataset.scholarshipId;
+                const button = this;
+                const icon = button.querySelector('i');
+
+                // Show loading state
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Processing...';
+                button.disabled = true;
+
+                // Correct URL construction
+                fetch(`/scholarships/toggle-wishlist/${scholarshipId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Update button appearance
+                        if (data.action === 'added') {
+                            button.classList.remove('btn-outline-primary');
+                            button.classList.add('btn-outline-secondary');
+                            button.innerHTML = '<i class="bi bi-bookmark-heart-fill"></i> Added';
+                        } else {
+                            button.classList.remove('btn-outline-secondary');
+                            button.classList.add('btn-outline-primary');
+                            button.innerHTML = '<i class="bi bi-bookmark-heart"></i> Add to wishlist';
+                        }
+                    } else {
+                        throw new Error(data.error || 'Unknown error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error updating wishlist: ' + error.message);
+                    button.innerHTML = originalText;
+                })
+                .finally(() => {
+                    button.disabled = false;
+                });
+            });
+        });
+
+        // Add spinning animation for loading state
+        const style = document.createElement('style');
+        style.textContent = `
+            .spin {
+                animation: spin 1s linear infinite;
+            }
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
     });
 
     function updateSort(value) {
@@ -207,39 +272,6 @@
         url.searchParams.set('sort', value);
         window.location.href = url.toString();
     }
-
-   document.addEventListener('DOMContentLoaded', function() {
-    // Wishlist toggle
-    document.querySelectorAll('.wishlist-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const scholarshipId = this.dataset.scholarshipId;
-            const button = this;
-            const icon = button.querySelector('i');
-
-            fetch(/scholarships/toggle-wishlist/${scholarshipId}/, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': getCookie('csrftoken'),
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    // Update button appearance
-                    if (data.action === 'added') {
-                        button.classList.replace('btn-outline-primary', 'btn-outline-secondary');
-                        icon.className = 'bi bi-bookmark-heart-fill';
-                        button.innerHTML = '<i class="bi bi-bookmark-heart-fill"></i> Added';
-                    } else {
-                        button.classList.replace('btn-outline-secondary', 'btn-outline-primary');
-                        icon.className = 'bi bi-bookmark-heart';
-                        button.innerHTML = '<i class="bi bi-bookmark-heart"></i> Add to wishlist';
-                    }
-                }
-            });
-        });
-    });
 
     // CSRF helper function
     function getCookie(name) {
@@ -256,6 +288,5 @@
         }
         return cookieValue;
     }
-});
 </script>
 {% endblock %}
