@@ -324,7 +324,6 @@ def remove_from_wishlist(request, scholarship_id):
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 
-# ---------- Announcements ----------
 @login_required(login_url='login')
 def announcements_list(request):
     announcements = Announcement.objects.all().order_by('-created_at')

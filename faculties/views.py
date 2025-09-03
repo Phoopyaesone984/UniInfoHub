@@ -37,38 +37,52 @@ def is_faculty_or_admin(user):
         return False
     return user.userprofile.role in ['FACULTY', 'ADMIN']
 
+
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 @login_required
 def faculty_dashboard_home(request):
     # Only faculty can access this dashboard
     if not hasattr(request.user, 'userprofile') or request.user.userprofile.role != 'FACULTY':
-        # You'll want to handle this with a redirect or an error page
         return redirect('home')
-        
-    # Fetch recent objects, filtered by the current user
-    # Note: We can't filter the Company model by user as it lacks the 'posted_by' field.
-    my_scholarships = Scholarship.objects.filter(posted_by=request.user)
-    for obj in my_scholarships:
-        obj.type = 'Scholarship'
-    
-    my_announcements = Announcement.objects.filter(posted_by=request.user)
-    for obj in my_announcements:
-        obj.type = 'Announcement'
 
+    my_scholarships_all = Scholarship.objects.filter(posted_by=request.user).order_by('-created_at')
+    # Scholarship pagination
+    scholarship_paginator = Paginator(my_scholarships_all, 3)
+    scholarship_page_number = request.GET.get('scholarship_page')
+
+    try:
+        my_scholarships = scholarship_paginator.get_page(scholarship_page_number)
+    except PageNotAnInteger:
+        my_scholarships = scholarship_paginator.get_page(1)
+    except EmptyPage:
+        my_scholarships = scholarship_paginator.get_page(scholarship_paginator.num_pages)
+
+    # Announcements with pagination
+    my_announcements_all = Announcement.objects.filter(posted_by=request.user).order_by('-created_at')
+    announcement_paginator = Paginator(my_announcements_all, 3)  # 5 announcements per page
+    announcement_page_number = request.GET.get('announcement_page')
+
+    try:
+        my_announcements = announcement_paginator.get_page(announcement_page_number)
+    except PageNotAnInteger:
+        my_announcements = announcement_paginator.get_page(1)
+    except EmptyPage:
+        my_announcements = announcement_paginator.get_page(announcement_paginator.num_pages)
+
+    # Recent activity section
     all_activities = sorted(
-        chain(my_scholarships, my_announcements),
-        key=attrgetter('created_at'), # The Announcement model has this field.
+        chain(my_scholarships_all, my_announcements_all),
+        key=attrgetter('created_at'),
         reverse=True
     )
-
-    # Get the 3 most recent activities for the dashboard
     recent_activities = all_activities[:3]
- 
+
     context = {
         'my_scholarships': my_scholarships,
-        'my_companies': Company.objects.all(), 
-        'my_announcements': my_announcements,# Keep this for the separate tab
-        'recent_activities': recent_activities,     
-        'total_count':   my_scholarships.count() + my_announcements.count()+ Company.objects.count(),
+        'my_announcements': my_announcements,  # This is now the paginated list
+        'my_companies': Company.objects.all(),
+        'recent_activities': recent_activities,
+        'total_count': my_scholarships_all.count() + my_announcements_all.count() + Company.objects.count(),
     }
 
     return render(request, 'dashboard/dashboard.html', context)
@@ -93,7 +107,7 @@ def post_scholarship(request):
                 scholarship.posted_by = request.user
                 scholarship.save()
                 messages.success(request, 'Scholarship posted successfully!')
-                return redirect('faculties:faculty_dashboard_home') # Redirect to dashboard after posting
+                return redirect(reverse('faculties:faculty_dashboard_home') + '#scholarships') # Redirect to dashboard after posting
             except Exception as e:
                 # Catch any unexpected errors during save
                 messages.error(request, f"An unexpected error occurred: {e}")
@@ -184,12 +198,12 @@ def delete_scholarship(request, scholarship_id):
         # Check if the current user is the owner or an admin
         if scholarship.posted_by != request.user and request.user.userprofile.role != 'ADMIN':
             messages.error(request, "You can only delete scholarships you've posted.")
-            return redirect('faculties:faculty_dashboard_home')
+            return redirect(reverse('faculties:faculty_dashboard_home') + '#scholarships')
 
         if request.method == 'POST':
             scholarship.delete()
             messages.success(request, 'Scholarship deleted successfully!')
-            return redirect('faculties:faculty_dashboard_home')
+            return redirect(reverse('faculties:faculty_dashboard_home') + '#scholarships')
 
         # If GET request, show confirmation page
         context = {
@@ -200,7 +214,7 @@ def delete_scholarship(request, scholarship_id):
 
     except Scholarship.DoesNotExist:
         messages.error(request, "The scholarship you're trying to delete doesn't exist.")
-        return redirect('faculties:faculty_dashboard_home')
+        return redirect(reverse('faculties:faculty_dashboard_home') + '#scholarships')
     
 
 
@@ -255,7 +269,7 @@ def post_announcement(request):
             # I have removed it here for cleaner code.
             
             messages.success(request, 'Announcement posted successfully.')
-            return redirect('faculties:faculty_dashboard_home')
+            return redirect(reverse('faculties:faculty_dashboard_home') + '#announcements')
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
@@ -285,7 +299,7 @@ def delete_announcement(request, pk):
     if request.method == 'POST':
         announcement.delete()
         messages.success(request, 'Announcement deleted successfully.')
-    return redirect('faculties:faculty_dashboard_home')
+    return redirect(reverse('faculties:faculty_dashboard_home') + '#announcements')
 
 @login_required
 def manage_users(request):
